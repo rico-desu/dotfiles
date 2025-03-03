@@ -1,0 +1,12 @@
+[user]
+	name = Susabh Gautam
+	email = susabh@disroot.org
+	signingkey = 9E1841A85EFB2E48
+[init]
+	defaultBranch = main
+[pull]
+	rebase = false
+[core]
+	editor = nvim
+[commit]
+	gpgsign = true

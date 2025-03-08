@@ -20,24 +20,20 @@ set $menu wmenu-run -i -f "JetBrainsMono Nerd Font 10"
 ## Web browser
 set $browser firefox
 
-## Path to wallpapers
-set $papes ~/.wallpapers/
-
 # Startup programs/scripts
 exec dbus-update-activation-environment DISPLAY I3SOCK SWAYSOCK WAYLAND_DISPLAY &
-exec artix-pipewire-loader &
 exec mako &
 
 # Output
 output eDP-1 {
     mode 1366x768@60Hz
-    bg $(find $papes -type f | shuf -n 1) fill
+    bg /usr/share/backgrounds/linuxmint/sele_linuxmint.png fill
 }
 
 # Input
 input "1:1:AT_Translated_Set_2_keyboard" {
     xkb_layout "gb"
-    xkb_variant "dvorak"
+    xkb_variant "dvorakukp"
 }
 
 input "2:7:SynPS/2_Synaptics_TouchPad" {
@@ -166,10 +162,33 @@ bindsym Alt+Print exec grim - | wl-copy
 bindsym Alt+Control+Print exec grim -g "$(slurp)" - | wl-copy
 
 # Xcursor theme
-seat seat0 xcursor_theme Adwaita
+seat seat0 xcursor_theme Bibata-Modern-Classic
 
 # Xwayland support
 xwayland force
 
 # Window rules
+
+## Reasonable floating window rules
+for_window [window_role = "pop-up"] floating enable
+for_window [window_role = "bubble"] floating enable
+for_window [window_role = "dialog"] floating enable
+for_window [window_type = "dialog"] floating enable
+for_window [window_role = "task_dialog"] floating enable
+for_window [window_type = "menu"] floating enable
+for_window [app_id = "floating"] floating enable
+for_window [app_id = "floating_update"] floating enable, resize set width 1000px height 600px
+for_window [class = "(?i)pinentry"] floating enable
+for_window [title = "Administrator privileges required"] floating enable
+
+## Start mpv in fullscreen
 for_window [app_id="mpv"] fullscreen enable
+
+## Make relevant Firefox windows float
+for_window [title = "About Mozilla Firefox"] floating enable
+for_window [window_role = "About"] floating enable
+for_window [app_id="firefox" title="Library"] floating enable, border pixel 1, sticky enable
+
+## Kill the sharing indicator window for Firefox
+for_window [title = "Firefox - Sharing Indicator"] kill
+for_window [title = "Firefox — Sharing Indicator"] kill

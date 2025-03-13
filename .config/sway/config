@@ -1,36 +1,37 @@
 include /etc/sway/config.d/*
+xwayland enable
 
-# Variables
+#
+# Basic variables
+#
 
-## Modifier key
 set $mod Mod4
-
-## Navigation keys
 set $left h
 set $down j
 set $up k
 set $right l
-
-## Terminal emulator
 set $term alacritty
+set $menu wmenu-run -i \
+    -f "JetBrainsMono Nerd Font 10"
 
-## App launcher
-set $menu wmenu-run -i -f "JetBrainsMono Nerd Font 10"
+set $screenshots-dir $(xdg-user-dir PICTURES)/screenshots
+set $wallpaper /usr/share/backgrounds/linuxmint/sele_linuxmint.png
 
-## Web browser
-set $browser firefox
+#
+# Startup programs
+#
 
-# Startup programs/scripts
-exec dbus-update-activation-environment DISPLAY I3SOCK SWAYSOCK WAYLAND_DISPLAY &
 exec mako &
 
-# Output
+#
+# I/O
+#
+
 output eDP-1 {
     mode 1366x768@60Hz
-    bg /usr/share/backgrounds/linuxmint/sele_linuxmint.png fill
+    bg $wallpaper fill
 }
 
-# Input
 input "1:1:AT_Translated_Set_2_keyboard" {
     xkb_layout "gb"
     xkb_variant "dvorakukp"
@@ -40,52 +41,46 @@ input "2:7:SynPS/2_Synaptics_TouchPad" {
     natural_scroll enabled
 }
 
-# Floating modifier
+#
+# Appearance
+#
+
+# Set the font
+font pango:JetBrainsMono Nerd Font 10
+
+# Set the gaps
+gaps inner 8
+
+# GTK themes and fonts
+set $set-gsettings-key "gsettings set org.gnome.desktop.interface"
+exec_always {
+    $set-gsettings-key gtk-theme "Mint-Y-Dark-Aqua"
+    $set-gsettings-key icon-theme "Mint-Y-Sand"
+    $set-gsettings-key cursor-theme "Bibata-Modern-Classic"
+    $set-gsettings-key font-name "Ubuntu 10"
+}
+
+#
+# Basic keybindings
+#
+
+bindsym $mod+Return exec $term
+bindsym $mod+d exec $menu
+bindsym $mod+Shift+q kill
+bindsym $mod+Shift+c reload
+bindsym $mod+Shift+Escape exec swaymsg exit
+
 floating_modifier $mod normal
 
-# Window borders
-default_border pixel 1
-default_floating_border normal
-hide_edge_borders smart
+bindsym F1 exec wpctl set-mute @DEFAULT_SINK@ toggle
+bindsym F2 exec wpctl set-volume @DEFAULT_SINK@ 5%-
+bindsym F3 exec wpctl set-volume @DEFAULT_SINK@ 5%+
 
-# Gaps
-gaps inner 4
-
-# Basic keybindings
-bindsym XF86AudioRaiseVolume exec wpctl set-volume @DEFAULT_SINK@ 5%+
-bindsym XF86AudioLowerVolume exec wpctl set-volume @DEFAULT_SINK@ 5%-
-bindsym $mod+Return exec $term
-bindsym $mod+Shift+q kill
-bindsym $mod+d exec $menu
-bindsym $mod+Shift+grave exec $browser
-bindsym $mod+Shift+c reload
-bindsym $mod+Shift+e exec swaymsg exit
-
-# Navigation
-
-## Change focus
-bindsym $mod+$left focus left
-bindsym $mod+$down focus down
-bindsym $mod+$up focus up
-bindsym $mod+$right focus right
-bindsym $mod+Left focus left
-bindsym $mod+Down focus down
-bindsym $mod+Up focus up
-bindsym $mod+Right focus right
-
-## Move the focused window
-bindsym $mod+Shift+$left move left
-bindsym $mod+Shift+$down move down
-bindsym $mod+Shift+$up move up
-bindsym $mod+Shift+$right move right
-bindsym $mod+Shift+Left move left
-bindsym $mod+Shift+Down move down
-bindsym $mod+Shift+Up move up
-bindsym $mod+Shift+Right move right
-
+#
 # Workspaces
+#
 
-## Change the workspace
+# Change the workspace
 bindsym $mod+1 workspace number 1
 bindsym $mod+2 workspace number 2
 bindsym $mod+3 workspace number 3
@@ -97,7 +92,7 @@ bindsym $mod+8 workspace number 8
 bindsym $mod+9 workspace number 9
 bindsym $mod+0 workspace number 10
 
-## Move the focused container to the workspace
+# Move the focused container to the workspace
 bindsym $mod+Shift+1 move container to workspace number 1
 bindsym $mod+Shift+2 move container to workspace number 2
 bindsym $mod+Shift+3 move container to workspace number 3
@@ -109,45 +104,69 @@ bindsym $mod+Shift+8 move container to workspace number 8
 bindsym $mod+Shift+9 move container to workspace number 9
 bindsym $mod+Shift+0 move container to workspace number 10
 
-# Layout
-bindsym $mod+b splith
-bindsym $mod+v splitv
+#
+# Containers
+#
+
+# Move the focused container around the screen
+bindsym $mod+Shift+$left move left
+bindsym $mod+Shift+$down move down
+bindsym $mod+Shift+$up move up
+bindsym $mod+Shift+$right move right
+
+# Change focus
+bindsym $mod+$left focus left
+bindsym $mod+$down focus down
+bindsym $mod+$up focus up
+bindsym $mod+$right focus right
+
+# Set the layout mode of the focused container
+bindsym $mod+b layout splith
+bindsym $mod+v layout splitv
 bindsym $mod+s layout stacking
 bindsym $mod+w layout tabbed
 bindsym $mod+e layout toggle split
+
+# Make the focused view fullscreen
 bindsym $mod+f fullscreen
+
+# Toggle the focused view between tiling and floating modes
 bindsym $mod+Shift+space floating toggle
+
+# Swap focus between the tiling and floating layers
 bindsym $mod+space focus mode_toggle
+
+# Move focus to the parent of the focused container
 bindsym $mod+a focus parent
 
-# Scratchpad
-bindsym $mod+Shift+minus move scratchpad
-bindsym $mod+minus scratchpad show
-
-# Resizing containers
+# Resize containers
 mode "resize" {
     bindsym $left resize shrink width 10px
     bindsym $down resize grow height 10px
     bindsym $up resize shrink height 10px
     bindsym $right resize grow width 10px
 
-    bindsym Left resize shrink width 10px
-    bindsym Down resize grow height 10px
-    bindsym Up resize shrink height 10px
-    bindsym Right resize grow width 10px
-
     bindsym Return mode "default"
     bindsym Escape mode "default"
 }
-
 bindsym $mod+r mode "resize"
 
+#
+# Scratchpad
+#
+
+bindsym $mod+Shift+minus move scratchpad
+bindsym $mod+minus scratchpad show
+
+#
 # Status bar
+#
+
 bar {
-    gaps 4
-    tray_output none
+    gaps 8
     font "JetBrainsMono Nerd Font 10"
     status_command while date +'%Y-%m-%d %I:%M %p'; do sleep 1; done
+    tray_output none
     colors {
         statusline #ffffff
         background #323232f2
@@ -155,21 +174,22 @@ bar {
     }
 }
 
+#
 # Screenshot functionality
-bindsym Print exec grim $(xdg-user-dir PICTURES)/shot_$(date +'%Y%m%d%H%M%S').png
-bindsym Control+Print exec grim -g "$(slurp)" $(xdg-user-dir PICTURES)/shot_$(date +'%Y%m%d%H%M%S').png
+#
+
+bindsym Print exec grim \
+    $screenshots-dir/screenshot_$(date +'%Y%m%d%H%M%S').png
+bindsym Control+Print exec grim -g "$(slurp)" \
+    $screenshots-dir/screenshot_$(date +'%Y%m%d%H%M%S').png
 bindsym Alt+Print exec grim - | wl-copy
 bindsym Alt+Control+Print exec grim -g "$(slurp)" - | wl-copy
 
-# Xcursor theme
-seat seat0 xcursor_theme Bibata-Modern-Classic
-
-# Xwayland support
-xwayland force
-
+#
 # Window rules
+#
 
-## Reasonable floating window rules
+# Basic floating window rules
 for_window [window_role = "pop-up"] floating enable
 for_window [window_role = "bubble"] floating enable
 for_window [window_role = "dialog"] floating enable
@@ -181,14 +201,14 @@ for_window [app_id = "floating_update"] floating enable, resize set width 1000px
 for_window [class = "(?i)pinentry"] floating enable
 for_window [title = "Administrator privileges required"] floating enable
 
-## Start mpv in fullscreen
-for_window [app_id="mpv"] fullscreen enable
-
-## Make relevant Firefox windows float
+# Make relevant Firefox windows float
 for_window [title = "About Mozilla Firefox"] floating enable
 for_window [window_role = "About"] floating enable
-for_window [app_id="firefox" title="Library"] floating enable, border pixel 1, sticky enable
+for_window [app_id = "firefox" title = "Library"] floating enable, border pixel 1, sticky enable
 
-## Kill the sharing indicator window for Firefox
+# Kill the sharing indicator window for Firefox
 for_window [title = "Firefox - Sharing Indicator"] kill
 for_window [title = "Firefox — Sharing Indicator"] kill
+
+# Make mpv windows fullscreen
+for_window [app_id = "mpv"] fullscreen enable
